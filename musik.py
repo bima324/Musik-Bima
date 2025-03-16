@@ -183,7 +183,7 @@ def main():
         # Mendapatkan URL yang valid
         urls = get_valid_urls()
 
-        output_folder = input("\n📂 Masukkan folder penyimpanan (default: downloads): ").strip() or "downloads"
+        output_folder = "/storage/emulated/0/Movies"
         os.makedirs(output_folder, exist_ok=True)
 
         # Mendapatkan kualitas audio jika mode audio dipilih
