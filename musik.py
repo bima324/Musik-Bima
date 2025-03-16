@@ -91,13 +91,14 @@ def download_audio_or_video(url, output_folder, quality, video_resolution, mode)
     elif mode == "video":
         resolution = video_resolutions.get(video_resolution, "1080p")
         ydl_opts = {
-            'format': f'bestvideo[height<={resolution}]+bestaudio/best',  # Pilih video dan audio terbaik sesuai resolusi
+            'format': f'bestvideo[ext=mp4][height<={resolution}]+bestaudio/best',  # Pilih video MP4 terbaik sesuai resolusi
             'outtmpl': generate_unique_filename(output_folder, '%(title)s', 'mp4', resolution),  # Untuk video
             'progress_hooks': [progress_hook],
             'continuedl': True,  # Resume download jika gagal
             'writethumbnail': True,  # Download thumbnail untuk video
             'noplaylist': True,  # Jika URL adalah playlist, hanya download 1 video
         }
+
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
