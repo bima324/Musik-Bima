@@ -9,7 +9,7 @@ import logging
 logging.basicConfig(filename='download_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
 
 def sanitize_filename(name):
-    return re.sub(r'[\\/*?:"<>|]', '', name)
+    return re.sub(r'[\/*?:"<>|]', '', name)
 
 def generate_unique_filename(folder, title, extension, quality_or_resolution):
     sanitized_title = sanitize_filename(title)
@@ -31,6 +31,9 @@ def progress_hook(d):
 def validate_url(url):
     return re.match(r'https?://(?:www\.)?(?:youtube\.com|youtu\.be)/.+', url)
 
+def scan_media(file_path):
+    subprocess.run(["termux-media-scan", file_path])
+
 def download_media(url, output_folder, quality, video_resolution, mode):
     if not validate_url(url):
         print(f"❌ URL {url} tidak valid!")
@@ -38,7 +41,7 @@ def download_media(url, output_folder, quality, video_resolution, mode):
     
     quality_map = {"1": "128k", "2": "192k", "3": "256k", "4": "320k"}
     video_resolutions = {"1": "1080", "2": "1440", "3": "2160", "4": "4320"}
-
+    
     ydl_opts = {
         'outtmpl': generate_unique_filename(output_folder, '%(title)s', 'mp3' if mode == 'audio' else 'mp4', quality_map.get(quality, "128k") if mode == 'audio' else video_resolutions.get(video_resolution, "1080")),
         'progress_hooks': [progress_hook],
@@ -66,7 +69,7 @@ def download_media(url, output_folder, quality, video_resolution, mode):
             ydl.download([url])
             logging.info(f"Download berhasil: {url}")
         
-        subprocess.run(["termux-media-scan", output_folder])
+        scan_media(output_folder)
     except yt_dlp.utils.DownloadError as e:
         logging.error(f"Error: {e}")
         print(f"❌ Error: {e}")
@@ -93,7 +96,7 @@ def main():
     while True:
         mode = get_input("\n✨ Pilih Mode Download:\n1. Download Audio MP3\n2. Download Video MP4\nMasukkan pilihan: ", {"1", "2"})
         mode = "audio" if mode == "1" else "video"
-        output_folder = "/storage/emulated/0/Music/" if mode == "audio" else "/storage/emulated/0/Movies/"
+        output_folder = "/storage/emulated/0/Music/" if mode == "audio" else "/storage/emulated/0/DCIM/"
         os.makedirs(output_folder, exist_ok=True)
 
         urls = input("\n🎵 Masukkan URL YouTube (pisahkan dengan koma jika lebih dari satu): ").split(',')
